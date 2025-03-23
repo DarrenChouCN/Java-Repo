@@ -1,10 +1,98 @@
-package topcoder.bruteforce;
+package topcoder;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Iteration {
+
+  /*
+   * AmoebaDivTwo
+   * 
+   * Little Romeo likes cosmic amoebas a lot. Recently he received one as a gift
+   * from his mother. He decided to place his amoeba on a rectangular table. The
+   * table is a grid of square 1x1 cells, and each cell is occupied by either
+   * matter or antimatter. The amoeba is a rectangle of size 1xK. Romeo can place
+   * it on the table in any orientation as long as every cell of the table is
+   * either completely covered by part of the amoeba or completely uncovered, and
+   * no part of the amoeba lies outside of the table. It is a well-known fact that
+   * cosmic amoebas cannot lie on top of matter, so every cell of the table
+   * covered by the amoeba must only contain antimatter.
+   * 
+   * 
+   * You are given a String[] table, where the j-th character of the i-th element
+   * is 'A' if the cell in row i, column j of the table contains antimatter or 'M'
+   * if it contains matter. Return the number of different ways that Romeo can
+   * place the cosmic amoeba on the table. Two ways are considered different if
+   * and only if there is a table cell that is covered in one but not the other.
+   */
+  public int count(String[] table, int K) {
+    return 0;
+  }
+
+  /*
+   * InterestingParty
+   * 
+   * Mr. White is a very versatile person - absolutely everything is interesting
+   * to him. Perhaps this is why he has many friends. Quite unfortunately,
+   * however, none of his friends are versatile at all. Each of them is interested
+   * only in two topics and refuses to talk about anything else. Therefore, each
+   * time Mr. White organizes a party, it's a big problem for him to decide whom
+   * to invite so that the party is interesting to everybody. Now that Mr. White
+   * has a lot of experience in organizing parties, he knows for sure that a party
+   * will be interesting if and only if there's a topic interesting to each of the
+   * invited friends.
+   * 
+   * You will be given String[]s first and second. The i-th friend of Mr. White is
+   * interested in topics first[i] and second[i]. Return the largest number of
+   * friends that Mr. White can invite to his party so that the party will be
+   * interesting.
+   */
+  public static int bestInvitation(String[] first, String[] second) {
+    Map<String, Integer> topicCount = new HashMap<>();
+
+    for (int i = 0; i < first.length; i++) {
+      topicCount.put(first[i], topicCount.getOrDefault(first[i], 0) + 1);
+      topicCount.put(second[i], topicCount.getOrDefault(second[i], 0) + 1);
+    }
+
+    int maxFriends = 0;
+    for (String topic : topicCount.keySet()) {
+      maxFriends = Math.max(maxFriends, topicCount.get(topic));
+    }
+
+    return maxFriends;
+  }
+
+  /*
+   * AnagramFree
+   * A string X is an anagram of string Y if X can be obtained by arranging all
+   * characters of Y in some order, without removing any characters and without
+   * adding new characters. For example, each of the strings "baba", "abab",
+   * "aabb" and "abba" is an anagram of "aabb", and strings "aaab", "aab" and
+   * "aabc" are not anagrams of "aabb".
+   * 
+   * A set of strings is anagram-free if it contains no pair of strings which are
+   * anagrams of each other. Given a set of strings S, return the size of its
+   * largest anagram-free subset. Note that the entire set is considered a subset
+   * of itself.
+   */
+  public static int getMaximumSubset(String[] S) {
+    Set<String> uniqueAnagrams = new HashSet<>();
+
+    for (String s : S) {
+      char[] charArray = s.toCharArray();
+      Arrays.sort(charArray);
+      String sortedArray = charArray.toString();
+      uniqueAnagrams.add(sortedArray);
+    }
+
+    return uniqueAnagrams.size();
+  }
 
   /*
    * Filtering
@@ -22,18 +110,37 @@ public class Iteration {
    * design filters of one specific kind called (A, B)-filters. Each such filter
    * is characterized by two integers A and B. It accepts an object if and only if
    * its size is between A and B, inclusive. You have excellent (A, B)-filter
-   * construction skills, so you can construct any such filter where 1 &lt;= A
-   * &lt;= B.
+   * construction skills, so you can construct any such filter where 1 <= A
+   * <= B.
    * 
    * If it is possible to construct an (A, B)-filter that fulfills all the
    * requirements described in sizes and outcome, return a int[] containing the
    * filter's parameters, where element 0 is A and element 1 is B. If there are
    * several appropriate filters, choose the one that minimizes B - A. If there
    * are no suitable filters, return an empty int[].
+   * 
+   * 
+   * Use a pointer to iterate through each element of sizes and outcome. If
+   * outcome is valid, update the minimum and maximum values accordingly. Finally,
+   * return an array containing the minimum and maximum values.
    */
 
-  public int[] designFilter(int[] sizes, String outcome) {
-    return sizes;
+  public static int[] designFilter(int[] sizes, String outcome) {
+    int min = Integer.MAX_VALUE;
+    int max = Integer.MIN_VALUE;
+
+    int pos = 0;
+    while (pos < sizes.length) {
+
+      char flag = outcome.charAt(pos);
+      if (flag == 'A') {
+        min = Math.min(min, sizes[pos]);
+        max = Math.max(max, sizes[pos]);
+      }
+      pos++;
+    }
+
+    return new int[] { min, max };
   }
 
   /*
@@ -51,7 +158,7 @@ public class Iteration {
    * 
    * **Use Java API PriorityQueue**
    */
-  public static int getMaximumPoints(int A, int B, int C, int N) {
+  public int getMaximumPoints(int A, int B, int C, int N) {
     int points = 0;
 
     // Using PriorityQueue to create a max heap, notice that default PriorityQueue
