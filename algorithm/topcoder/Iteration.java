@@ -11,6 +11,69 @@ import java.util.Set;
 public class Iteration {
 
   /*
+   * BadVocabulary
+   * 
+   * Little Teddy and Little Tracy are now learning how to speak words. Their
+   * mother, of course, doesn't want them to speak bad words. According to her
+   * definition, a word W is bad if at least one of the following conditions hold
+   * (see the notes section for definitions):
+   * 
+   * W contains the string badPrefix as a prefix.
+   * W contains the string badSuffix as a suffix.
+   * W contains the string badSubstring as a contiguous substring that is neither
+   * a prefix nor a suffix of W.
+   * You are given a String[] vocabulary representing the words that Teddy and
+   * Tracy are going to learn. Return the number of bad words in vocabulary.
+   */
+
+  /*
+   * TimeTravellingCellar
+   * 
+   * Gogo owns N wine cellars, numbered 0 through N-1. He possesses a time machine
+   * and will use it to advance time in one of the cellars, maturing all the wine
+   * inside. However, as a side effect, he must also choose one other cellar and
+   * turn back time there, making the wine inside younger.
+   * 
+   * You are given two int[]s, profit and decay. Advancing time in cellar i will
+   * gain Gogo a profit of profit[i]. Turning back time in cellar i will lose him
+   * decay[i] in profit. Return the maximum profit that Gogo can gain by advancing
+   * time in one cellar and turning time back in another cellar. It is guaranteed
+   * that this profit will be positive.
+   * 
+   * When selecting the optimal combination from two arrays while ensuring
+   * different indices, index conflicts (i == j) are a crucial edge case to
+   * consider. Therefore, it is essential to pre-select the top two maximum
+   * profits and the top two minimum decays to guarantee a valid solution without
+   * missing the optimal one.
+   */
+  public int determineProfit(int[] profit, int[] decay) {
+    int n = profit.length;
+
+    PriorityQueue<int[]> maxHeapProfit = new PriorityQueue<>((a, b) -> b[0] - a[0]);
+    PriorityQueue<int[]> minHeapDecay = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+
+    for (int i = 0; i < n; i++) {
+      maxHeapProfit.offer(new int[] { profit[i], i });
+      minHeapDecay.offer(new int[] { decay[i], i });
+    }
+
+    int[] bestProfit = maxHeapProfit.poll();
+    int[] secondBestProfit = maxHeapProfit.poll();
+
+    int[] bestDecay = minHeapDecay.poll();
+    int[] secondBestDecay = minHeapDecay.poll();
+
+    int maxProfit = Integer.MIN_VALUE;
+    if (bestProfit[1] != bestDecay[1]) {
+      maxProfit = bestProfit[0] - bestDecay[0];
+    } else {
+      maxProfit = Math.max(secondBestProfit[0] - bestDecay[0], bestProfit[0] - secondBestDecay[0]);
+    }
+
+    return maxProfit;
+  }
+
+  /*
    * AmoebaDivTwo
    * 
    * Little Romeo likes cosmic amoebas a lot. Recently he received one as a gift
@@ -52,7 +115,7 @@ public class Iteration {
    * friends that Mr. White can invite to his party so that the party will be
    * interesting.
    */
-  public static int bestInvitation(String[] first, String[] second) {
+  public int bestInvitation(String[] first, String[] second) {
     Map<String, Integer> topicCount = new HashMap<>();
 
     for (int i = 0; i < first.length; i++) {
