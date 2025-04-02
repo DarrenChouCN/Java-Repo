@@ -11,6 +11,18 @@ import java.util.Set;
 public class Iteration {
 
   /*
+   * TheBoredomDivTwo
+   * 
+   * John and Brus are bored. They have n+m common friends. The first n of them
+   * are bored and other m are not. John chooses the j-th (1-based) friend for a
+   * talk. If the friend is not bored, he becomes bored after the talk. Brus does
+   * the same with the b-th (1-based) friend. Note that John and Brus can't choose
+   * the same friend.
+   * 
+   * You have to find the number of bored friends after the talks.
+   */
+
+  /*
    * BadVocabulary
    * 
    * Little Teddy and Little Tracy are now learning how to speak words. Their
@@ -25,6 +37,33 @@ public class Iteration {
    * You are given a String[] vocabulary representing the words that Teddy and
    * Tracy are going to learn. Return the number of bad words in vocabulary.
    */
+  public int count(String badPrefix, String badSuffix, String badSubstring, String[] vocabulary) {
+    int badWordsCount = 0;
+
+    for (String word : vocabulary) {
+      if (isBadWord(word, badPrefix, badSuffix, badSubstring)) {
+        badWordsCount++;
+      }
+    }
+    return badWordsCount;
+  }
+
+  private boolean isBadWord(String word, String badPrefix, String badSuffix, String badSubString) {
+    if (word.startsWith(badPrefix)) {
+      return true;
+    }
+
+    if (word.endsWith(badSuffix)) {
+      return true;
+    }
+
+    int index = word.indexOf(badSubString);
+    if (index != -1 && index != 0 && index + badSubString.length() != word.length()) {
+      return true;
+    }
+
+    return false;
+  }
 
   /*
    * TimeTravellingCellar
