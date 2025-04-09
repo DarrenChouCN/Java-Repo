@@ -1,4 +1,4 @@
-package block3.UnsealtheSafe;
+package block3.UnsealTheSafe;
 
 /*
 UnsealtheSafe
@@ -34,7 +34,7 @@ Thought process:
   4. After finishing filling the dp table, calculate the sum of the N steps for all starting digits.
 
  */
-public class UnsealtheSafe {
+public class UnsealTheSafe {
 
   private final int[][] directions = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
 
@@ -44,11 +44,6 @@ public class UnsealtheSafe {
       { 7, 8, 9 },
       { 0, -1, -1 }
   };
-
-  public static void main(String[] args) {
-    UnsealtheSafe safe = new UnsealtheSafe();
-    System.out.println(safe.countPasswords(3));
-  }
 
   public long countPasswords(int N) {
     if (N < 1)
@@ -91,6 +86,11 @@ public class UnsealtheSafe {
     return total;
   }
 
+  public static void main(String[] args) {
+    UnsealTheSafe safe = new UnsealTheSafe();
+    System.out.println(safe.countPasswords(3));
+  }
+
   private long recursion(int[][] keypad, int N, int row, int col, int curDigit) {
     if (curDigit == N) {
       return 1;
@@ -110,7 +110,7 @@ public class UnsealtheSafe {
     return curCount;
   }
 
-  public long countPasswordsRecursion(int N) {
+  private long countPasswordsRecursion(int N) {
     if (N < 2 || N > 30) {
       return 0;
     }
