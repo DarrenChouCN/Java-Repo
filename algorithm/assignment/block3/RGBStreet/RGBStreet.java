@@ -9,6 +9,19 @@ Problem Statement
 
   You will be given a String[] houses, where the ith element corresponds to house i. Each element of houses will be formatted as "R G B" (quotes for clarity only), where R, G and B are the costs of painting the corresponding house red, green, and blue, respectively. Return the minimal total cost required to perform the work.
  
+
+Process:
+  1. 1. Parse the original 'houses' arr, get the cost of three colors and fill the 2D arrays
+
+  2. Create dynamic programming table, which R(0) G(1) B(2), column represents i-th house
+
+  3. Fill the dp table in column-first order
+
+  4. When a house choose a color, the neighbor cannot choose the same color, so the dp table reflects the minimum valid cost up to that house
+
+  5. Get the minimum value from the last column of dp table — that is the minimum total cost
+
+  6. The logic works because at each step we only consider valid color combinations (no two adjacent houses share the same color), and build from previous states
  */
 public class RGBStreet {
 
