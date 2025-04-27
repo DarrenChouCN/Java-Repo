@@ -1,4 +1,4 @@
-package topcoder;
+package topcoder.basic;
 
 public class Recursion {
 

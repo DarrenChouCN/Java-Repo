@@ -91,37 +91,38 @@ public class UnsealTheSafe {
     System.out.println(safe.countPasswords(3));
   }
 
-  private long recursion(int[][] keypad, int N, int row, int col, int curDigit) {
-    if (curDigit == N) {
-      return 1;
-    }
-    long curCount = 0;
-    for (int i = 0; i < directions.length; i++) {
-      int dx = row + directions[i][0];
-      int dy = col + directions[i][1];
-      if (dx < 0 || dx >= keypad.length)
-        continue;
-      if (dy < 0 || dy >= keypad[dx].length)
-        continue;
-      if (keypad[dx][dy] == -1)
-        continue;
-      curCount += recursion(keypad, N, dx, dy, curDigit + 1);
-    }
-    return curCount;
-  }
+  // private long recursion(int[][] keypad, int N, int row, int col, int curDigit)
+  // {
+  // if (curDigit == N) {
+  // return 1;
+  // }
+  // long curCount = 0;
+  // for (int i = 0; i < directions.length; i++) {
+  // int dx = row + directions[i][0];
+  // int dy = col + directions[i][1];
+  // if (dx < 0 || dx >= keypad.length)
+  // continue;
+  // if (dy < 0 || dy >= keypad[dx].length)
+  // continue;
+  // if (keypad[dx][dy] == -1)
+  // continue;
+  // curCount += recursion(keypad, N, dx, dy, curDigit + 1);
+  // }
+  // return curCount;
+  // }
 
-  private long countPasswordsRecursion(int N) {
-    if (N < 2 || N > 30) {
-      return 0;
-    }
+  // private long countPasswordsRecursion(int N) {
+  // if (N < 2 || N > 30) {
+  // return 0;
+  // }
 
-    int count = 0;
-    for (int i = 0; i <= 9; i++) {
-      int row = i / 3;
-      int col = i % 3;
-      count += recursion(keypad, N, row, col, 1);
-    }
-    return count;
-  }
+  // int count = 0;
+  // for (int i = 0; i <= 9; i++) {
+  // int row = i / 3;
+  // int col = i % 3;
+  // count += recursion(keypad, N, row, col, 1);
+  // }
+  // return count;
+  // }
 
 }

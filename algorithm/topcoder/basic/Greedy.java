@@ -1,4 +1,4 @@
-package topcoder;
+package topcoder.basic;
 
 import java.util.ArrayList;
 import java.util.Collections;
