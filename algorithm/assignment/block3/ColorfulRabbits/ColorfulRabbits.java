@@ -17,9 +17,9 @@ ColorfulRabbits
 
   4. Divide the total number of such rabbits into full groups of size x + 1. Each full group fully satisfies the condition that each rabbit has x others like it.
 
-  5. If there are leftover rabbits that cannot form a complete group: we still need to count one extra group of size x + 1 to account for them; this assumes that some same-colored rabbits exist but were not surveyed.
+  5. If there are leftover rabbits that cannot form a complete group: I still need to count one extra group of size x + 1 to account for them; this assumes that some same-colored rabbits exist but were not surveyed.
 
-  6. If only one rabbit gave a particular answer x, we must still assume it belongs to a full group of x + 1 rabbits.
+  6. If only one rabbit gave a particular answer x, I must still assume it belongs to a full group of x + 1 rabbits.
 
   7. Sum all the rabbits across all groups to get the minimum possible total number of rabbits in the town.
  */
