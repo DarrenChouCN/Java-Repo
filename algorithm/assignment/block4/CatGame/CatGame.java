@@ -1,5 +1,9 @@
 package block4.CatGame;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /*
 CatGame
 
@@ -10,7 +14,40 @@ CatGame
 public class CatGame {
 
   public int getNumber(int[] coordinates, int X) {
-    return 0;
+    int n = coordinates.length;
+    List<Integer> list = new ArrayList<>();
+
+    for (int i = 0; i < n; i++) {
+      list.add(coordinates[i] - X);
+      list.add(coordinates[i] + X);
+    }
+
+    Collections.sort(list);
+
+    int res = Integer.MAX_VALUE;
+    for (int i = 0; i < list.size(); i++) {
+      for (int j = i; j < list.size(); j++) {
+        int leftMost = list.get(i);
+        int rightMost = list.get(j);
+
+        boolean valid = true;
+        for (int k = 0; k < n; k++) {
+          int left = coordinates[k] - X;
+          int right = coordinates[k] + X;
+
+          if ((left < leftMost || left > rightMost) &&
+              (right < leftMost || right > rightMost)) {
+            valid = false;
+            break;
+          }
+        }
+
+        if (valid)
+          res = Math.min(res, rightMost - leftMost);
+      }
+    }
+
+    return res;
   }
 
   public static void main(String[] args) {

@@ -1,5 +1,10 @@
 package block4.CellRemoval;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 /*
 CellRemoval
 
@@ -14,13 +19,53 @@ CellRemoval
 public class CellRemoval {
 
   public int cellsLeft(int[] parent, int deletedCell) {
-    return 0;
+    int n = parent.length;
+    List<List<Integer>> tree = new ArrayList<>();
+
+    for (int i = 0; i < n; i++) {
+      tree.add(new ArrayList<>());
+    }
+
+    int root = -1;
+    for (int i = 0; i < n; i++) {
+      if (parent[i] == -1) {
+        root = i;
+      } else {
+        tree.get(parent[i]).add(i);
+      }
+    }
+
+    if (root == deletedCell) {
+      return 0;
+    }
+
+    return dfs(tree, root, deletedCell);
+  }
+
+  private int dfs(List<List<Integer>> tree, int current, int deletedCell) {
+    if (current == deletedCell) {
+      return 0;
+    }
+
+    List<Integer> children = tree.get(current);
+    int count = 0;
+    boolean hasValidChild = false;
+
+    for (int child : children) {
+      if (child != deletedCell) {
+        hasValidChild = true;
+        count += dfs(tree, child, deletedCell);
+      }
+    }
+
+    return hasValidChild ? count : 1;
   }
 
   public static void main(String[] args) {
     CellRemoval removal = new CellRemoval();
-    int[] parent = {};
-    int deletedCell = 0;
+    int[] parent = { 26, 2, 32, 36, 40, 19, 43, 24, 30, 13, 21, 14, 24, 21, 19, 4, 30, 10, 44, 12, 7, 32, 17, 43,
+        35, 18, 7, 36, 10, 16, 5, 38, 35, 4, 13, -1, 16, 26, 1, 12, 2, 5, 18, 40, 1, 17, 38, 44, 14 };
+    int deletedCell = 24;
     System.out.println(removal.cellsLeft(parent, deletedCell));
   }
 

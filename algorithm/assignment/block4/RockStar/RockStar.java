@@ -22,8 +22,42 @@ package block4.RockStar;
  */
 public class RockStar {
 
+  private int maxSongs = 0;
+
   public int getNumSongs(int ff, int fs, int sf, int ss) {
-    return 0;
+    if (ff > 0)
+      dfs(ff - 1, fs, sf, ss, 'f', 1);
+    if (fs > 0)
+      dfs(ff, fs - 1, sf, ss, 's', 1);
+
+    if (ff == 0 && fs == 0) {
+      if (sf > 0)
+        dfs(ff, fs, sf - 1, ss, 'f', 1);
+      if (ss > 0)
+        dfs(ff, fs, sf, ss - 1, 's', 1);
+    }
+
+    return maxSongs;
+  }
+
+  private void dfs(int ff, int fs, int sf, int ss, char lastCh, int length) {
+
+    maxSongs = Math.max(maxSongs, length);
+
+    if (lastCh == 'f') {
+      if (ff > 0)
+        dfs(ff - 1, fs, sf, ss, 'f', length + 1);
+
+      if (fs > 0)
+        dfs(ff, fs - 1, sf, ss, 's', length + 1);
+
+    } else {
+      if (sf > 0)
+        dfs(ff, fs, sf - 1, ss, 'f', length + 1);
+
+      if (ss > 0)
+        dfs(ff, fs, sf, ss - 1, 's', length + 1);
+    }
   }
 
   public static void main(String[] args) {
