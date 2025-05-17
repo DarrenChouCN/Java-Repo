@@ -1,5 +1,8 @@
 package block4.JumpyNum;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /*
  JumpyNum
 
@@ -12,12 +15,65 @@ package block4.JumpyNum;
 public class JumpyNum {
 
   public int howMany(int low, int high) {
-    return 0;
+    int count = 0;
+
+    Queue<Long> queue = new LinkedList<>();
+    for (int i = 1; i <= 9; i++) {
+      queue.offer((long) i);
+    }
+
+    while (!queue.isEmpty()) {
+      long num = queue.poll();
+
+      if (num >= low) {
+        count++;
+      }
+
+      int lastDigit = (int) num % 10;
+      for (int d = 0; d <= 9; d++) {
+        if (Math.abs(d - lastDigit) >= 2) {
+          long next = num * 10 + d;
+          if (next <= high) {
+            queue.offer(next);
+          }
+        }
+      }
+    }
+
+    return count;
+  }
+
+  private int count = 0;
+
+  public int howManyDFS(int low, int high) {
+    count = 0;
+
+    for (int i = 1; i <= 9; i++) {
+      dfs(i, low, high);
+    }
+
+    return count;
+  }
+
+  private void dfs(long num, int low, int high) {
+    if (num >= low) {
+      count++;
+    }
+
+    int lastDigit = (int) num % 10;
+    for (int d = 0; d <= 9; d++) {
+      if (Math.abs(d - lastDigit) >= 2) {
+        long next = num * 10 + d;
+        if (next <= high) {
+          dfs(next, low, high);
+        }
+      }
+    }
   }
 
   public static void main(String[] args) {
     JumpyNum jumpyNum = new JumpyNum();
-    System.out.println(jumpyNum.howMany(0, 0));
+    System.out.println(jumpyNum.howMany(8000, 20934));
   }
 
 }
