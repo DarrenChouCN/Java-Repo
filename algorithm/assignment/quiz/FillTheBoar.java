@@ -1,6 +1,16 @@
 package quiz;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /*
 FillTheBoar
@@ -17,36 +27,54 @@ FillTheBoar
  */
 public class FillTheBoar {
 
-  public int eaten(int stomach, int[] muffins, int delay) {
-    Arrays.sort(muffins);
+  static class State {
+    int mask, sum;
+
+    State(int mask, int sum) {
+      this.mask = mask;
+      this.sum = sum;
+    }
+  }
+
+  public static int eaten(int stomach, int[] muffins, int delay) {
     int n = muffins.length;
+    int max = 0;
+    Queue<State> queue = new LinkedList<>();
+    queue.offer(new State(0, 0));
+    Set<String> visited = new HashSet<>();
 
-    int total = 0;
-    int restStomach = stomach;
-    for (int i = 0; i < n; i++) {
-      if (restStomach > muffins[i]) {
-        total += muffins[i];
-        restStomach -= muffins[i];
-        muffins[i] = -1;
-      } else {
-        break;
+    while (!queue.isEmpty()) {
+      State s = queue.poll();
+      if (s.sum >= stomach) {
+        List<Integer> remain = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+          if (((s.mask >> i) & 1) == 0)
+            remain.add(muffins[i]);
+        remain.sort(Collections.reverseOrder());
+        int add = 0;
+        for (int i = 0; i < Math.min(delay, remain.size()); i++)
+          add += remain.get(i);
+        max = Math.max(max, s.sum + add);
+        continue;
       }
-    }
-
-    for (int i = muffins.length - 1; i >= 0; i--) {
-      if (delay > 0 && muffins[i] != -1) {
-        total += muffins[i];
-        delay--;
-      } else {
-        break;
+      for (int i = 0; i < n; i++) {
+        if (((s.mask >> i) & 1) == 0) {
+          int nextMask = s.mask | (1 << i);
+          int nextSum = s.sum + muffins[i];
+          String key = nextMask + "," + nextSum;
+          if (!visited.contains(key)) {
+            queue.offer(new State(nextMask, nextSum));
+            visited.add(key);
+          }
+        }
       }
+      max = Math.max(max, s.sum);
     }
-
-    return total;
+    return max;
   }
 
   public static void main(String[] args) {
-    FillTheBoar fillTheBoar = new FillTheBoar();
-    System.out.println(fillTheBoar.eaten(4700, new int[] { 1000, 8000, 2000, 5000, 3000 }, 0));
+    System.out.println(eaten(4700, new int[] { 1000, 8000, 2000, 5000, 3000 }, 0));
   }
+
 }
