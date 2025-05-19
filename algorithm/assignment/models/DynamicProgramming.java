@@ -15,6 +15,12 @@ public class DynamicProgramming {
    * --------------------------------------------------
    * 3.1 Fibonacci – Top‑Down + Bottom‑Up O(n)
    * Applicable: 展示『记忆化搜索』⇄『迭代滚动数组』等同。
+   * 
+   * 台阶跳跃问题（Climbing Stairs）
+   * 解码方式数（Decode Ways）
+   * 最小/最大路径代价（Min Path Sum）
+   * 线性结构的 DP 问题：前一个状态决定当前状态
+   * 任意形如 dp[i] = f(dp[i - 1], dp[i - 2]) 的问题
    */
   public long fibMemo(int n) {
     return fibMemo(n, new HashMap<>());
@@ -23,7 +29,10 @@ public class DynamicProgramming {
   private long fibMemo(int n, Map<Integer, Long> memo) {
     if (n <= 1)
       return n;
-    return memo.computeIfAbsent(n, k -> fibMemo(k - 1, memo) + fibMemo(k - 2, memo));
+    if (!memo.containsKey(n)) {
+      memo.put(n, fibMemo(n - 1, memo) + fibMemo(n - 2, memo));
+    }
+    return memo.get(n);
   }
 
   public long fibIter(int n) {
