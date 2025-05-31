@@ -17,8 +17,14 @@ public class DynamicProgramming {
    * Applicable: 展示『记忆化搜索』⇄『迭代滚动数组』等同。
    * 
    * 台阶跳跃问题（Climbing Stairs）
-   * 解码方式数（Decode Ways）
+   * 
+   * 解码方式数（Decode Ways）：给一个数字串（如 "123"），每个数字对应一个字母（1→A, 2→B...26→Z），问有多少种合法解码方式。
+   * if (s[i-1] 有效) dp[i] += dp[i-1];
+   * if (s[i-2,i-1] 组合有效) dp[i] += dp[i-2];
+   * 
    * 最小/最大路径代价（Min Path Sum）
+   * dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+   * 
    * 线性结构的 DP 问题：前一个状态决定当前状态
    * 任意形如 dp[i] = f(dp[i - 1], dp[i - 2]) 的问题
    */
@@ -51,14 +57,26 @@ public class DynamicProgramming {
    * --------------------------------------------------
    * 3.2 0/1 Knapsack – O(n * W) (W = capacity)
    * Applicable: 背包系题，能进一步改写成一维滚动数组节省空间。
+   * 
+   * 最多能装下几个任务（价值恒为 1）
+   * 每个任务有时间成本（视作重量），价值为 1，问最多能选多少任务不超过时间上限。
+   * dp[j] = max(dp[j], dp[j - time[i]] + 1)
+   * 
+   * 判断是否可以刚好填满容量（布尔型 DP）
+   * 给一组物品，是否能恰好装满背包。
+   * dp[j] |= dp[j - weight[i]]
+   * 
+   * 子集和 / 能否分成相等两部分
+   * 给一组正整数，判断是否可以划分成两个和相等的子集。
+   * dp[j] |= dp[j - nums[i]]
    */
-  public int knap01(int[] w, int[] v, int cap) {
-    int n = w.length;
-    int[] dp = new int[cap + 1]; // dp[j] = max value with capacity j
+  public int knap01(int[] weight, int[] value, int capacity) {
+    int n = weight.length;
+    int[] dp = new int[capacity + 1]; // dp[j] = max value with capacity j
     for (int i = 0; i < n; i++)
-      for (int j = cap; j >= w[i]; j--)
-        dp[j] = Math.max(dp[j], dp[j - w[i]] + v[i]);
-    return dp[cap];
+      for (int j = capacity; j >= weight[i]; j--)
+        dp[j] = Math.max(dp[j], dp[j - weight[i]] + value[i]);
+    return dp[capacity];
   }
 
   /*
