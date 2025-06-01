@@ -22,7 +22,6 @@ public class FamilyTravel {
       this.distance = distance;
       this.lastDistance = lastDistance;
     }
-
   }
 
   public int shortest(String[] edges) {
@@ -45,11 +44,10 @@ public class FamilyTravel {
     }
 
     PriorityQueue<State> pq = new PriorityQueue<>(Comparator.comparingInt(s -> s.distance));
+    // state { 0, 0, 53 }: current city; total distance so far; previous distance
+    pq.offer(new State(0, 0, 53));
 
     boolean[][] visited = new boolean[n][54];
-
-    // state { 0, 0, 53 }: total distance so far; current city; previous distance
-    pq.offer(new State(0, 0, 53));
 
     while (!pq.isEmpty()) {
       State state = pq.poll();
