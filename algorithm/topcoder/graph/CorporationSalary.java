@@ -1,4 +1,4 @@
-package block5.CorporationSalary;
+package topcoder.graph;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
