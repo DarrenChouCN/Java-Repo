@@ -1,4 +1,4 @@
-package block5.BigBurger;
+package topcoder.greedy;
 
 /*
 BigBurger 

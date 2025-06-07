@@ -1,4 +1,4 @@
-package block5.ErdosNumber;
+package topcoder.graph.bfs;
 
 import java.util.ArrayList;
 import java.util.Collections;

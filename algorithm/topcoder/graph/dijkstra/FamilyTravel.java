@@ -1,4 +1,4 @@
-package block5.FamilyTravel;
+package topcoder.graph.dijkstra;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

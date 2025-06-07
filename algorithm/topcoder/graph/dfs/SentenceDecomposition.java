@@ -1,4 +1,4 @@
-package block5.SentenceDecomposition;
+package topcoder.graph.dfs;
 
 import java.util.Arrays;
 import java.util.HashMap;

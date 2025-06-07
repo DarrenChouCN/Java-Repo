@@ -1,4 +1,4 @@
-package topcoder.graph;
+package topcoder.graph.bfs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
