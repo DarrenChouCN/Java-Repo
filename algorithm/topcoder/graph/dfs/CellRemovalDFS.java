@@ -1,9 +1,7 @@
-package block4.CellRemoval;
+package topcoder.graph.dfs;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /*
 CellRemoval
@@ -16,7 +14,7 @@ CellRemoval
 
   You are given a int[] parentCell describing the development process of an organism. The i-th element of parentCell is the parent cell of cell i (where i is a 0-based index). The zygote's parent is -1. Return the number of cells the mature form of this organism would have if you killed cell deletedCell during the development process.
  */
-public class CellRemoval {
+public class CellRemovalDFS {
 
   public int cellsLeft(int[] parent, int deletedCell) {
     int n = parent.length;
@@ -61,60 +59,12 @@ public class CellRemoval {
     return hasValidChild ? count : 1;
   }
 
-  public int cellsLeftBFS(int[] parent, int deletedCell) {
-    int n = parent.length;
-    List<List<Integer>> tree = new ArrayList<>();
-    for (int i = 0; i < n; i++) {
-      tree.add(new ArrayList<>());
-    }
-
-    int root = -1;
-    for (int i = 0; i < n; i++) {
-      if (parent[i] == -1) {
-        root = i;
-      } else {
-        tree.get(parent[i]).add(i);
-      }
-    }
-
-    if (root == deletedCell)
-      return 0;
-
-    int leafCount = 0;
-    Queue<Integer> queue = new LinkedList<>();
-    queue.offer(root);
-
-    while (!queue.isEmpty()) {
-      int current = queue.poll();
-      List<Integer> children = tree.get(current);
-
-      if (children.isEmpty()) {
-        leafCount++;
-        continue;
-      }
-
-      boolean hasValidChild = false;
-      for (int child : children) {
-        if (child != deletedCell) {
-          queue.offer(child);
-          hasValidChild = true;
-        }
-      }
-
-      if (!hasValidChild) {
-        leafCount++;
-      }
-    }
-
-    return leafCount;
-  }
-
   public static void main(String[] args) {
-    CellRemoval removal = new CellRemoval();
+    CellRemovalDFS removal = new CellRemovalDFS();
     int[] parent = { 26, 2, 32, 36, 40, 19, 43, 24, 30, 13, 21, 14, 24, 21, 19, 4, 30, 10, 44, 12, 7, 32, 17, 43,
         35, 18, 7, 36, 10, 16, 5, 38, 35, 4, 13, -1, 16, 26, 1, 12, 2, 5, 18, 40, 1, 17, 38, 44, 14 };
     int deletedCell = 24;
-    System.out.println(removal.cellsLeftBFS(parent, deletedCell));
+    System.out.println(removal.cellsLeft(parent, deletedCell));
   }
 
 }

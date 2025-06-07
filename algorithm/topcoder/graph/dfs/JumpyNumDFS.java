@@ -1,7 +1,4 @@
-package block4.JumpyNum;
-
-import java.util.LinkedList;
-import java.util.Queue;
+package topcoder.graph.dfs;
 
 /*
  JumpyNum
@@ -12,36 +9,7 @@ import java.util.Queue;
               JUMPY: 290464, 13131313, 97539753, 5
   Create a class JumpyNum that contains a method howMany that is given low and high and returns the number of jumpy numbers that are between low and high, inclusive.
  */
-public class JumpyNum {
-
-  public int howMany(int low, int high) {
-    int count = 0;
-
-    Queue<Long> queue = new LinkedList<>();
-    for (int i = 1; i <= 9; i++) {
-      queue.offer((long) i);
-    }
-
-    while (!queue.isEmpty()) {
-      long num = queue.poll();
-
-      if (num >= low) {
-        count++;
-      }
-
-      int lastDigit = (int) num % 10;
-      for (int d = 0; d <= 9; d++) {
-        if (Math.abs(d - lastDigit) >= 2) {
-          long next = num * 10 + d;
-          if (next <= high) {
-            queue.offer(next);
-          }
-        }
-      }
-    }
-
-    return count;
-  }
+public class JumpyNumDFS {
 
   private int count = 0;
 
@@ -72,8 +40,8 @@ public class JumpyNum {
   }
 
   public static void main(String[] args) {
-    JumpyNum jumpyNum = new JumpyNum();
-    System.out.println(jumpyNum.howMany(8000, 20934));
+    JumpyNumDFS jumpyNum = new JumpyNumDFS();
+    System.out.println(jumpyNum.howManyDFS(8000, 20934));
   }
 
 }
