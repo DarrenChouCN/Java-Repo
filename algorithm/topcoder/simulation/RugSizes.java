@@ -1,4 +1,4 @@
-package block1.RugSizes;
+package topcoder.simulation;
 
 /*
 RugSizes

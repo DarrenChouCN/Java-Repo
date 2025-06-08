@@ -1,4 +1,4 @@
-package block1.Inchworm;
+package topcoder.simulation;
 
 /*
 Inchworm
@@ -77,7 +77,6 @@ public class Inchworm {
         int lunchtime4 = inchworm.lunchtime(15, 16, 5);
         int lunchtime5 = inchworm.lunchtime(1000, 3, 7);
         int lunchtime6 = inchworm.lunchtime(1000, 7, 3);
-
 
         String lunchtime = "lunchtime(11, 2, 4): " + lunchtime0 + "\n" +
                 "lunchtime(12, 6, 4): " + lunchtime1 + "\n" +

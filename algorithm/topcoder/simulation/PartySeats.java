@@ -1,4 +1,4 @@
-package block1.PartySeats;
+package topcoder.simulation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

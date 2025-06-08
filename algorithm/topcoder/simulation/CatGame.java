@@ -1,4 +1,4 @@
-package block4.CatGame;
+package topcoder.simulation;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package block1.SquareOfDigits;
+package topcoder.simulation;
 
 /*
 SquareOfDigits
@@ -59,12 +59,12 @@ public class SquareOfDigits {
     public static void main(String[] args) {
         SquareOfDigits digits = new SquareOfDigits();
 
-        String[] data1 = {"12", "34"};
-        String[] data2 = {"1255", "3455"};
-        String[] data3 = {"42101", "22100", "22101"};
-        String[] data4 = {"1234567890"};
-        String[] data5 = {"9785409507", "2055103694", "0861396761", "3073207669", "1233049493",
-                "2300248968", "9769239548", "7984130001", "1670020095", "8894239889", "4053971072"};
+        String[] data1 = { "12", "34" };
+        String[] data2 = { "1255", "3455" };
+        String[] data3 = { "42101", "22100", "22101" };
+        String[] data4 = { "1234567890" };
+        String[] data5 = { "9785409507", "2055103694", "0861396761", "3073207669", "1233049493",
+                "2300248968", "9769239548", "7984130001", "1670020095", "8894239889", "4053971072" };
 
         int result1 = digits.getMax(data1);
         int result2 = digits.getMax(data2);
