@@ -1,4 +1,4 @@
-package block2.QuickSums;
+package topcoder.recursion;
 
 /*
 QuickSums

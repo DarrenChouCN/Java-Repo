@@ -1,4 +1,4 @@
-package block2.FibonacciDiv2;
+package topcoder.basic;
 
 /*
 FibonacciDiv2

@@ -1,4 +1,4 @@
-package block3.MatchNumbersEasy;
+package topcoder.greedy;
 
 /*
 MatchNumbersEasy

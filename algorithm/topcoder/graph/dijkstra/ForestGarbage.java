@@ -1,4 +1,4 @@
-package block3.ForestGarbage;
+package topcoder.graph.dijkstra;
 
 import java.util.Arrays;
 import java.util.PriorityQueue;

@@ -1,4 +1,4 @@
-package block3.CastleGuards;
+package topcoder.basic;
 
 import java.util.HashMap;
 import java.util.Map;

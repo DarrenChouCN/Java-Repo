@@ -1,4 +1,4 @@
-package block3.RGBStreet;
+package topcoder.dp;
 
 /*
 RGBStreet

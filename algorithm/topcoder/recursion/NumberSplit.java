@@ -1,4 +1,4 @@
-package block2.NumberSplit;
+package topcoder.recursion;
 
 import java.util.ArrayList;
 import java.util.List;

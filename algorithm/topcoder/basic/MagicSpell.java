@@ -1,4 +1,4 @@
-package block3.MagicSpell;
+package topcoder.basic;
 
 /*
 MagicSpell
