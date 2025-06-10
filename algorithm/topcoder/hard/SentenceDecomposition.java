@@ -1,4 +1,4 @@
-package lecture;
+package topcoder.hard;
 
 import java.util.Arrays;
 import java.util.HashMap;

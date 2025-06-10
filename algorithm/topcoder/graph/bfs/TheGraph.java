@@ -1,11 +1,11 @@
-package lecture;
+package topcoder.graph.bfs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class Graph {
+public class TheGraph {
 
   /*
    * Markus is working in the Tree Research Center. It may come as a surprise that
@@ -27,11 +27,11 @@ public class Graph {
    * possible diameter of a tree that matches the given information.
    */
   public int maxD(int[] cnt) {
-    List<List<Integer>> tree = buildTree(cnt);
+    List<List<Integer>> tree = buildGraph(cnt);
     return bfsDiameter(tree);
   }
 
-  private List<List<Integer>> buildTree(int[] cnt) {
+  private List<List<Integer>> buildGraph(int[] cnt) {
     List<List<Integer>> adj = new ArrayList<>();
     int nodeId = 0;
     adj.add(new ArrayList<>());
@@ -102,7 +102,7 @@ public class Graph {
   }
 
   public static void main(String[] args) {
-    Graph graph = new Graph();
+    TheGraph graph = new TheGraph();
 
     int[] cnt = { 4, 2, 1, 3, 2, 5, 7, 2, 4, 5, 2, 3, 1, 13, 6 };
     System.out.println(graph.maxD(cnt));

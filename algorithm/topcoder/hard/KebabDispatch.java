@@ -1,4 +1,4 @@
-package lecture;
+package topcoder.hard;
 
 /*
 KebabDispatch
