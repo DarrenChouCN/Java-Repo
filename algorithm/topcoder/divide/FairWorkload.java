@@ -19,4 +19,52 @@ FairWorkload
  */
 public class FairWorkload {
 
+  public int getMostWork(int[] folders, int workers) {
+    int low = 0, high = 0;
+    for (int f : folders) {
+      low = Math.max(low, f);
+      high += f;
+    }
+
+    while (low < high) {
+      int mid = (low + high) / 2;
+      if (canSplit(folders, workers, mid)) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+
+    return low;
+  }
+
+  boolean canSplit(int[] folders, int workers, int maxWork) {
+    int required = 1; // 至少需要一个工人（第一段）
+    int current = 0; // 当前工人累积工作量
+    for (int f : folders) {
+      if (current + f > maxWork) {
+        required++; // 超出限制，只能交给下一个工人
+        current = f; // 新工人重新开始干活
+      } else {
+        current += f; // 当前工人继续接任务
+      }
+    }
+    return required <= workers; // 看是否在限定人数内
+  }
+
+  public static void main(String[] args) {
+    int[] folders1 = { 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+    int[] folders2 = { 568, 712, 412, 231, 241, 393, 865, 287, 128, 457, 238, 98, 980, 23, 782 };
+    int[] folders3 = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1000 };
+    int[] folders4 = { 50, 50, 50, 50, 50, 50, 50 };
+    int[] folders5 = { 1, 1, 1, 1, 100 };
+
+    FairWorkload lWorkload = new FairWorkload();
+    System.out.println(lWorkload.getMostWork(folders1, 3));// 170
+    System.out.println(lWorkload.getMostWork(folders1, 5));// 110
+    System.out.println(lWorkload.getMostWork(folders2, 4));// 1785
+    System.out.println(lWorkload.getMostWork(folders3, 2));// 1000
+    System.out.println(lWorkload.getMostWork(folders4, 2));// 200
+    System.out.println(lWorkload.getMostWork(folders5, 5));// 100
+  }
 }
