@@ -1,4 +1,4 @@
-package topcoder.dp.knapsack;
+package topcoder.hard;
 
 import java.util.ArrayList;
 import java.util.Arrays;

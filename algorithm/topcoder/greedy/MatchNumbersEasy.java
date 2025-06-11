@@ -96,7 +96,6 @@ public class MatchNumbersEasy {
     System.out.println(solver.maxNumber(test2, 30));
     System.out.println(solver.maxNumber(test3, 1));
     System.out.println(solver.maxNumber(test4, 50));
-
   }
 
 }
