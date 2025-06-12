@@ -1,4 +1,4 @@
-package topcoder.greedy.FoxAndMountainEasy;
+package topcoder.greedy;
 
 /*
 FoxAndMountainEasy

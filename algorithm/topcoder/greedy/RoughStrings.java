@@ -1,4 +1,4 @@
-package topcoder.greedy.FoxAndMountainEasy;
+package topcoder.greedy;
 
 import java.util.ArrayList;
 import java.util.List;
