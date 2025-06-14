@@ -1,4 +1,4 @@
-package topcoder.dp;
+package topcoder.dp.sequenceDP;
 
 /*
 ToolMission
@@ -15,40 +15,40 @@ public class ToolMission {
 
   public int planRoutes(int[] minTools, int[] maxTools) {
     int n = minTools.length;
-    int V = 0;
+    int maxTool = 0;
 
     for (int x : maxTools) {
-      V = Math.max(V, x);
+      maxTool = Math.max(maxTool, x);
     }
 
-    int[] dp = new int[V + 2];
+    int[] dpPrev = new int[maxTool + 2];
     for (int t = minTools[0]; t <= maxTools[0]; t++) {
-      dp[t] = 1;// 1个递增序列数
+      dpPrev[t] = 1;// 1个递增序列数
     }
 
     // i表示区域
     for (int i = 1; i < n; i++) {
-      int[] prefix = new int[V + 2];
-      for (int t = 1; t <= V; t++) {
-        prefix[t] = prefix[t - 1] + dp[t];
-        if (prefix[t] >= MOD)
-          prefix[t] -= MOD;
+      int[] prefixSum = new int[maxTool + 2];
+      for (int t = 1; t <= maxTool; t++) {
+        prefixSum[t] = prefixSum[t - 1] + dpPrev[t];
+        if (prefixSum[t] >= MOD)
+          prefixSum[t] -= MOD;
       }
 
-      int[] next = new int[V + 2];
+      int[] dpCurr = new int[maxTool + 2];
       int L = minTools[i], R = maxTools[i];
       for (int t = L; t <= R; t++) {
         // 到第 i 个区域，选中工具数为 t 时，有多少种合法递增序列？
-        next[t] = prefix[t - 1];
+        dpCurr[t] = prefixSum[t - 1];
       }
-      dp = next;
+      dpPrev = dpCurr;
     }
 
-    long ans = 0;
-    for (int val : dp)
-      ans += val;
+    long total = 0;
+    for (int val : dpPrev)
+      total += val;
 
-    return (int) (ans % MOD);
+    return (int) (total % MOD);
   }
 
   public static void main(String[] args) {

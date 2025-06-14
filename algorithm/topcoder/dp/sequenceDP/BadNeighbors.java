@@ -1,4 +1,4 @@
-package topcoder.dp;
+package topcoder.dp.sequenceDP;
 
 /*
 BadNeighbors
