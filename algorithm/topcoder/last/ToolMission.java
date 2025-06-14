@@ -1,4 +1,4 @@
-package topcoder.dp.sequenceDP;
+package topcoder.last;
 
 /*
 ToolMission

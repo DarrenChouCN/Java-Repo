@@ -1,4 +1,4 @@
-package topcoder.graph.dijkstra;
+package topcoder.last;
 
 import java.util.ArrayList;
 import java.util.Arrays;
