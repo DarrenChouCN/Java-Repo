@@ -53,17 +53,17 @@ public class KebabDispatch {
         }
       }
     }
-
-    dijkstra(terrain, sx, sy, distGrid);
-
     int n = orders.size();
     if (n == 0)
       return 0;
+
+    dijkstra(terrain, sx, sy, distGrid);
+
     int[] d = new int[n];
-    for (int k = 0; k < n; k++) {
-      int[] p = orders.get(k);
-      d[k] = distGrid[p[0]][p[1]];
-      if (d[k] >= INF)
+    for (int i = 0; i < n; i++) {
+      int[] p = orders.get(i);
+      d[i] = distGrid[p[0]][p[1]];
+      if (d[i] >= INF)
         return -1;// 无法到达
     }
     // only one order
@@ -75,24 +75,24 @@ public class KebabDispatch {
     // 把1左移n位，表示2个配送员共有2^n种分配方式，以这种方式展开按位枚举
     int total = 1 << n;
     for (int mask = 0; mask < total; mask++) {
-      long sumA = 0, sumB = 0, maxA = 0, maxB = 0;
+      long sumA = 0, sumB = 0, lastA = 0, lastB = 0;
       for (int i = 0; i < n; i++) {
         if ((mask & (1 << i)) != 0) {
           // mask 的第 i 位是 1 → 属于骑手 A
           sumA += d[i];// 骑手A距离总和
-          if (d[i] > maxA)
-            maxA = d[i];// 更新骑手A最远距离
+          if (lastA < d[i])
+            lastA = d[i];// 更新骑手A最远距离
         } else {
           // 否则属于骑手B
           sumB += d[i];// 骑手B距离总和
-          if (d[i] > maxB)
-            maxB = d[i];// 更新骑手B最远距离
+          if (lastB < d[i])
+            lastB = d[i];// 更新骑手B最远距离
         }
       }
       // 当前遍历到 d[i]，但这个订单可能属于 B 配送员，而不是 A，所以它不能作为 A 的最后一单。
       // 最短路径最后一个d[i]，也就是最后一次配送只需要送，无需返回，所以需要- maxA或maxB
-      long timeA = (sumA == 0) ? 0 : 2 * sumA - maxA;
-      long timeB = (sumB == 0) ? 0 : 2 * sumB - maxB;
+      long timeA = (sumA == 0) ? 0 : 2 * sumA - lastA;
+      long timeB = (sumB == 0) ? 0 : 2 * sumB - lastB;
       best = Math.min(best, Math.max(timeA, timeB));
     }
 
@@ -170,13 +170,13 @@ public class KebabDispatch {
         "3442211",
         "34$221X",
         "3442211" };
-    System.out.println(kd.calculateMinimumTime(terrain1));
+    System.out.println(kd.calculateMinimumTime(terrain1));// 8
 
     String[] terrain2 = {
         "001000$",
         "$010X0$",
         "0010000" };
-    System.out.println(kd.calculateMinimumTime(terrain2));
+    System.out.println(kd.calculateMinimumTime(terrain2));// 13
 
     String[] terrain3 = {
         "001000$",
@@ -185,7 +185,7 @@ public class KebabDispatch {
         "2232222",
         "2222222",
         "111$111" };
-    System.out.println(kd.calculateMinimumTime(terrain3));
+    System.out.println(kd.calculateMinimumTime(terrain3));// -1
 
     String[] terrain4 = {
         "001000$",
@@ -194,11 +194,11 @@ public class KebabDispatch {
         "1232222",
         "2222222",
         "111$111" };
-    System.out.println(kd.calculateMinimumTime(terrain4));
+    System.out.println(kd.calculateMinimumTime(terrain4));// 28
 
     String[] terrain5 = {
         "X$$",
         "$$$" };
-    System.out.println(kd.calculateMinimumTime(terrain5));
+    System.out.println(kd.calculateMinimumTime(terrain5));// 14
   }
 }

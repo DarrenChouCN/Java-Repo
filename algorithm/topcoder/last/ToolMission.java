@@ -36,8 +36,7 @@ public class ToolMission {
       }
 
       int[] dpCurr = new int[maxTool + 2];
-      int L = minTools[i], R = maxTools[i];
-      for (int t = L; t <= R; t++) {
+      for (int t = minTools[i]; t <= maxTools[i]; t++) {
         // 到第 i 个区域，选中工具数为 t 时，有多少种合法递增序列？
         dpCurr[t] = prefixSum[t - 1];
       }
@@ -77,7 +76,6 @@ public class ToolMission {
     int[] minTools6 = { 1 };
     int[] maxTools6 = { 1000000000 };
     System.out.println(toolMission.planRoutes(minTools6, maxTools6));// 1755647
-
   }
 
 }
