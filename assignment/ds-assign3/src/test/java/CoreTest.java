@@ -250,5 +250,4 @@ public class CoreTest {
         learner.onAccepted(7, n, "X");
         assertEquals(1, times.get());
     }
-
 }
