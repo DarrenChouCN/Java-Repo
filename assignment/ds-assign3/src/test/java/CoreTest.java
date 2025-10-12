@@ -27,10 +27,10 @@ public class CoreTest {
         ProposalNumber p = new ProposalNumber(3, 4);
         ProposalNumber next = p.nextRound();
 
-        assertEquals(3, p.round());
-        assertEquals(4, p.memberId());
-        assertEquals(4, next.round());
-        assertEquals(4, next.memberId());
+        assertEquals(3, p.getRound());
+        assertEquals(4, p.getMemberId());
+        assertEquals(4, next.getRound());
+        assertEquals(4, next.getMemberId());
         assertTrue(p.compareTo(next) < 0);
     }
 
@@ -67,7 +67,7 @@ public class CoreTest {
         PaxosState s = new PaxosState();
         ProposalNumber n1 = new ProposalNumber(1, 1);
 
-        PaxosState.PromiseResult r1 = s.onPrepare(n1);
+        Result.PromiseResult r1 = s.onPrepare(n1);
         assertTrue(r1.promised);
         assertNull(r1.lastAcceptedN);
         assertNull(r1.lastAcceptedV);
@@ -82,7 +82,7 @@ public class CoreTest {
 
         // promise n2: round 2 > null
         assertTrue(s.onPrepare(n2).promised);
-        PaxosState.PromiseResult r = s.onPrepare(n1);
+        Result.PromiseResult r = s.onPrepare(n1);
 
         // reject n1: round 1 < round 2
         assertFalse(r.promised);
@@ -96,7 +96,7 @@ public class CoreTest {
 
         // promise n3: round 3 > null
         assertTrue(s.onPrepare(n3).promised);
-        PaxosState.AcceptResult a = s.onAcceptRequest(n3, "M5");
+        Result.AcceptResult a = s.onAcceptRequest(n3, "M5");
         assertTrue(a.accepted);
         assertEquals(n3, a.acceptedN);
         assertEquals("M5", a.acceptedV);
@@ -115,7 +115,7 @@ public class CoreTest {
         assertTrue(s.onPrepare(n5).promised);
 
         // reject n4: round 4 < round 5
-        PaxosState.AcceptResult a = s.onAcceptRequest(n4, "M1");
+        Result.AcceptResult a = s.onAcceptRequest(n4, "M1");
         assertFalse(a.accepted);
         assertNull(s.acceptedN());
         assertNull(s.acceptedV());
@@ -135,7 +135,7 @@ public class CoreTest {
         assertTrue(s.onAcceptRequest(n2, "M8").accepted);
 
         // promise n3 and check it carries last accepted pair
-        PaxosState.PromiseResult p = s.onPrepare(n3);
+        Result.PromiseResult p = s.onPrepare(n3);
         assertTrue(p.promised);
         assertEquals(n2, p.lastAcceptedN);
         assertEquals("M8", p.lastAcceptedV);
@@ -148,10 +148,10 @@ public class CoreTest {
 
         ProposalNumber n = new ProposalNumber(7, 3);
 
-        PaxosState.PromiseResult pr = acceptor.onPrepare(n);
+        Result.PromiseResult pr = acceptor.onPrepare(n);
         assertTrue(pr.promised);
 
-        PaxosState.AcceptResult ar = acceptor.onAcceptRequest(n, "M4");
+        Result.AcceptResult ar = acceptor.onAcceptRequest(n, "M4");
         assertTrue(ar.accepted);
         assertEquals(n, ar.acceptedN);
         assertEquals("M4", ar.acceptedV);
@@ -171,7 +171,7 @@ public class CoreTest {
         // promise nHigh
         assertTrue(acceptor.onPrepare(nHigh).promised);
         // reject nLow
-        PaxosState.AcceptResult ar = acceptor.onAcceptRequest(nLow, "X");
+        Result.AcceptResult ar = acceptor.onAcceptRequest(nLow, "X");
 
         assertFalse(ar.accepted);
         assertNull(state.acceptedN());

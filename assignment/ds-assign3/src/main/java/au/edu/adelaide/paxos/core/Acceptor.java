@@ -13,12 +13,12 @@ public class Acceptor {
     }
 
     // Handles a prepare request from a proposer
-    public PaxosState.PromiseResult onPrepare(ProposalNumber n) {
+    public Result.PromiseResult onPrepare(ProposalNumber n) {
         return state.onPrepare(n);
     }
 
     // Handles an accept request from a proposer
-    public PaxosState.AcceptResult onAcceptRequest(ProposalNumber n, String v) {
+    public Result.AcceptResult onAcceptRequest(ProposalNumber n, String v) {
         return state.onAcceptRequest(n, v);
     }
 }

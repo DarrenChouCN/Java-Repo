@@ -54,11 +54,11 @@ public class ProposalNumber implements Comparable<ProposalNumber> {
         return new ProposalNumber(Long.parseLong(parts[0]), Integer.parseInt(parts[1]));
     }
 
-    public long round() {
+    public long getRound() {
         return round;
     }
 
-    public int memberId() {
+    public int getMemberId() {
         return memberId;
     }
 }

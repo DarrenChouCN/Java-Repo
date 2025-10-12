@@ -2,6 +2,7 @@ package au.edu.adelaide.paxos.core;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -39,12 +40,21 @@ public class Proposer {
     private String chosenValueForAccept = null;
     private boolean phase2Sent = false;
 
+    // backoff policy for retries
+    private BackoffPolicy backoffPolicy;
+    private boolean sawRejection = false;// whether we saw a rejection in the last round
+    private long retryIndex = 0;
+
     public Proposer(int memberId, Quorum quorum, PrepareBroadcaster broadcaster, AcceptBroadcaster acceptBroadcaster) {
         if (memberId <= 0) throw new IllegalArgumentException("memberId > 0 required");
         this.memberId = memberId;
         this.quorum = Objects.requireNonNull(quorum, "quorum");
         this.broadcaster = Objects.requireNonNull(broadcaster, "broadcaster");
         this.acceptBroadcaster = Objects.requireNonNull(acceptBroadcaster, "acceptBroadcaster");
+    }
+
+    public synchronized void setBackoffPolicy(BackoffPolicy backoffPolicy) {
+        this.backoffPolicy = backoffPolicy;
     }
 
     /**
@@ -66,6 +76,10 @@ public class Proposer {
         highestAcceptedV = null;
         chosenValueForAccept = null;
         clientValue = value;
+
+        // if we saw a rejection in the last round, backoff before retrying
+        sawRejection = false;
+        retryIndex = 0;
 
         // start phase 1
         roundCounter += 1;
@@ -89,9 +103,12 @@ public class Proposer {
     public synchronized void onPromise(
             int fromMemberId, ProposalNumber n, boolean promised, ProposalNumber lastAcceptedN, String lastAcceptedV) {
         // ignore if not for current proposal or phase 1 already done
-        if (currentN == null) return;
-        if (!currentN.equals(n)) return;
-        if (!promised) return;
+        if (currentN == null || !currentN.equals(n)) return;
+        if (!promised) {
+            // saw a rejection, will need to backoff before retrying
+            sawRejection = true;
+            return;
+        }
         if (phase1Done) return;
 
         if (!promisedFrom.add(fromMemberId)) {
@@ -118,6 +135,36 @@ public class Proposer {
         }
     }
 
+    public synchronized boolean shouldRetry() {
+        return !phase1Done && sawRejection;
+    }
+
+    /**
+     * Concurrent Proposal Handling with Backoff
+     * If phase 1 is not done, retry index, resets the state for a new attempt, and broadcasts a new prepare message with an incremented proposal number.
+     * If phase 1 is already done, it simply returns the current proposal number.
+     * Expect Outcome: The Paxos algorithm correctly resolves the conflict, and all proposers reach a consensus on a single value.
+     *
+     * @return the new or current proposal number
+     */
+    public synchronized ProposalNumber retryOnce(){
+        if(phase1Done)
+            return currentN;
+        retryIndex+=1;
+
+        // backoff if we have a policy
+        promisedFrom.clear();
+        highestAcceptedN = null;
+        highestAcceptedV = null;
+        chosenValueForAccept = null;
+        sawRejection = false;
+
+        roundCounter+=1;
+        currentN = new ProposalNumber(roundCounter, memberId);
+        broadcaster.broadcastPrepare(currentN);
+        return currentN;
+    }
+
     public synchronized ProposalNumber currentN() {
         return currentN;
     }
@@ -136,6 +183,34 @@ public class Proposer {
 
     public synchronized boolean phase2Sent() {
         return phase2Sent;
+    }
+
+    public synchronized long currentBackoffMillis() {
+        return (backoffPolicy == null) ? 0L : backoffPolicy.delayMillis(retryIndex);
+    }
+
+    // Backoff policy for retries
+    public interface BackoffPolicy {
+        long delayMillis(long retryIndex);
+    }
+
+    public final class ExponentialJitterBackoff implements BackoffPolicy {
+
+        private final long baseMillis, maxMillis;
+        private final Random random = new Random();
+
+        public ExponentialJitterBackoff(long baseMillis, long maxMillis) {
+            this.baseMillis = baseMillis;
+            this.maxMillis = maxMillis;
+        }
+
+        @Override
+        public long delayMillis(long retryIndex) {
+            long exp = baseMillis << Math.min(retryIndex, 10); // cap at 10 to avoid overflow;
+            long cap = Math.min(exp, maxMillis);
+            long jitter = (cap <= 4) ? 0 : random.nextInt((int) (cap / 4));
+            return Math.min(cap + jitter, maxMillis);
+        }
     }
 
 }
