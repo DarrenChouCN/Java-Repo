@@ -1,6 +1,7 @@
 package au.edu.adelaide.paxos.transport;
 
 import au.edu.adelaide.paxos.core.*;
+import au.edu.adelaide.paxos.fault.FaultInjector;
 
 import static au.edu.adelaide.paxos.transport.PaxosMessage.Type.ACCEPT_REQUEST;
 import static au.edu.adelaide.paxos.transport.PaxosMessage.Type.PREPARE;
@@ -23,8 +24,20 @@ public class Dispatcher {
         this.learner = learner;
     }
 
+    // Fault injection support
+    private FaultInjector injector = FaultInjector.NOOP;
+
+    public void setFaultInjector(FaultInjector injector) {
+        this.injector = (injector == null ? FaultInjector.NOOP : injector);
+    }
+
     public void onMessage(PaxosMessage m) {
-        if (m == null) return;
+        if (m == null)
+            return;
+
+        // inject on receive side (before calling any role)
+        if (!injector.beforeSendOrDispatch(m, "dispatch", /*to*/ localMemberId))
+            return;
 
         switch (m.type()) {
             case CLIENT_PROPOSE -> handleClientPropose(m);
@@ -45,14 +58,7 @@ public class Dispatcher {
         ProposalNumber pn = ProposalNumberIO.parse(m.n());
         Result.PromiseResult r = acceptor.onPrepare(pn); // uses your PaxosState API
         // reply PROMISE back to sender
-        PaxosMessage resp = PaxosMessage.newMessage(PaxosMessage.Type.PROMISE)
-                .from(localMemberId).to(m.from())
-                .n(format(pn))
-                .promised(r.promised)
-                .acceptedN(format(r.lastAcceptedN))
-                .acceptedV(r.lastAcceptedV)
-                .corr(m.corr())
-                .build();
+        PaxosMessage resp = PaxosMessage.newMessage(PaxosMessage.Type.PROMISE).from(localMemberId).to(m.from()).n(format(pn)).promised(r.promised).acceptedN(format(r.lastAcceptedN)).acceptedV(r.lastAcceptedV).corr(m.corr()).build();
         transport.send(m.from(), resp);
     }
 
@@ -62,12 +68,8 @@ public class Dispatcher {
         Result.AcceptResult ar = acceptor.onAcceptRequest(pn, m.v());
         if (ar.accepted) {
             // Broadcast ACCEPTED to all learners (and proposers if they listen)
-            PaxosMessage accepted = PaxosMessage.newMessage(PaxosMessage.Type.ACCEPTED)
-                    .from(localMemberId).to(null)
-                    .n(format(ar.acceptedN))   // reflect what acceptor actually persisted
-                    .v(ar.acceptedV)
-                    .corr(m.corr())
-                    .build();
+            PaxosMessage accepted = PaxosMessage.newMessage(PaxosMessage.Type.ACCEPTED).from(localMemberId).to(null).n(format(ar.acceptedN))   // reflect what acceptor actually persisted
+                    .v(ar.acceptedV).corr(m.corr()).build();
             transport.broadcast(accepted);
         }
         // If not accepted, classic Paxos does not require a negative message here.
@@ -89,14 +91,12 @@ public class Dispatcher {
 
     // Convenience: outgoing sends from proposer side
     public void broadcastPrepare(ProposalNumber n, String corr) {
-        PaxosMessage msg = PaxosMessage.newMessage(PREPARE)
-                .from(localMemberId).to(null).n(format(n)).corr(corr).build();
+        PaxosMessage msg = PaxosMessage.newMessage(PREPARE).from(localMemberId).to(null).n(format(n)).corr(corr).build();
         transport.broadcast(msg);
     }
 
     public void broadcastAcceptRequest(ProposalNumber n, String v, String corr) {
-        PaxosMessage msg = PaxosMessage.newMessage(ACCEPT_REQUEST)
-                .from(localMemberId).to(null).n(format(n)).v(v).corr(corr).build();
+        PaxosMessage msg = PaxosMessage.newMessage(ACCEPT_REQUEST).from(localMemberId).to(null).n(format(n)).v(v).corr(corr).build();
         transport.broadcast(msg);
     }
 

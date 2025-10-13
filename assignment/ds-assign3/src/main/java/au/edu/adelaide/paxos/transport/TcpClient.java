@@ -1,4 +1,26 @@
 package au.edu.adelaide.paxos.transport;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
 public class TcpClient {
+
+    public void send(InetSocketAddress address, PaxosMessage msg) {
+        String line = PaxosMessageParser.toJson(msg) + "\n";
+        try (Socket socket = new Socket()) {
+            socket.connect(address);
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            writer.write(line);
+            writer.flush();
+            System.out.println("sent to " + address + " : " + msg.type() +
+                    " from=" + msg.from() + " to=" + msg.to() + " n=" + msg.n());
+        } catch (IOException e) {
+            System.err.println("send failed to " + address + " : " + e.getMessage());
+        }
+    }
 }
