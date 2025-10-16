@@ -2,7 +2,7 @@ import au.edu.adelaide.paxos.core.*;
 import au.edu.adelaide.paxos.transport.Dispatcher;
 import au.edu.adelaide.paxos.transport.InMemoryTransport;
 import au.edu.adelaide.paxos.transport.PaxosMessage;
-import au.edu.adelaide.paxos.transport.PaxosMessageParser;
+import au.edu.adelaide.paxos.util.PaxosMessageParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;

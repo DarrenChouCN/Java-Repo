@@ -1,5 +1,6 @@
 import au.edu.adelaide.paxos.transport.*;
 import au.edu.adelaide.paxos.util.NetworkConfigLoader;
+import au.edu.adelaide.paxos.util.PaxosMessageParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

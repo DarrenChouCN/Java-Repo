@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 /**
  * Facade for network transport: TCP server + client, message queue, dispatcher threads.
  */
-public final class TransportFacade implements AutoCloseable {
+public class TransportFacade implements AutoCloseable {
 
     private final int selfId;
     private final NetworkConfigLoader cfg;

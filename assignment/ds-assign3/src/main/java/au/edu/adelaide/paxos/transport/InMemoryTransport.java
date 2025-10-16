@@ -1,5 +1,7 @@
 package au.edu.adelaide.paxos.transport;
 
+import au.edu.adelaide.paxos.util.PaxosMessageParser;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,7 @@
 package au.edu.adelaide.paxos.transport;
 
+import au.edu.adelaide.paxos.util.PaxosMessageParser;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;

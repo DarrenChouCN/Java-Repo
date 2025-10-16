@@ -1,5 +1,6 @@
-package au.edu.adelaide.paxos.transport;
+package au.edu.adelaide.paxos.util;
 
+import au.edu.adelaide.paxos.transport.PaxosMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;

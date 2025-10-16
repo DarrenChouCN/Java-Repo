@@ -1,5 +1,7 @@
 package au.edu.adelaide.paxos.transport;
 
+import au.edu.adelaide.paxos.util.PaxosMessageParser;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
