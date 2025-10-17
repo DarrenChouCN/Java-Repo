@@ -33,7 +33,7 @@ public class TcpStackTest {
 
         public RecordingDispatcher(int memberId) {
             // transport/proposer/acceptor/learner are not used by this recorder
-            super(memberId, null, null, null, null);
+            super(memberId, null, null, null);
         }
 
         @Override
@@ -85,7 +85,7 @@ public class TcpStackTest {
             String json = PaxosMessageParser.toJson(msg) + "\n";
 
             TcpClient client = new TcpClient();
-            client.send(new InetSocketAddress("127.0.0.1", freePort),
+            client.sendPaxosMessage(new InetSocketAddress("127.0.0.1", freePort),
                     PaxosMessage.newMessage(PREPARE).from(10).n("5.1").corr("c-prep").build());
 
             // expect the server reader to enqueue exactly that message

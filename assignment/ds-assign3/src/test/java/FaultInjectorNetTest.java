@@ -31,7 +31,7 @@ public class FaultInjectorNetTest {
         final BlockingQueue<PaxosMessage> inbox = new LinkedBlockingQueue<>();
 
         public RecordingDispatcher(int memberId) {
-            super(memberId, null, null, null, null);
+            super(memberId, null, null, null);
         }
 
         @Override

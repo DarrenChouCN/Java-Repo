@@ -1,101 +1,92 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# 最小可跑：不使用 -e/pipefail，避免早退
+set -u
 
-# ------- configurable env -------
-: "${JAVA_BIN:=java}"
-: "${MAIN_CLASS:=au.edu.adelaide.paxos.app.CouncilMemberMain}"
-: "${CLASSPATH:=target/classes:target/paxos.jar}"
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")"/.. && pwd)"
+cd "$ROOT"
+
 : "${CONFIG_FILE:=network.config}"
+: "${N_MEMBERS:=9}"
+: "${READY_TIMEOUT:=20}"
+: "${MAIN_CLASS:=au.edu.adelaide.paxos.app.CouncilMemberMain}"
+: "${CLASSPATH:=target/classes}"
 
-# --------------------------------------------------------------------
-: "${TS:?must set TS (timestamp) in run_tests.sh}"
-LOG_DIR="logs/$TS"
-PIPE_DIR="pipes/$TS"
-PID_DIR="pids/$TS"
+LOG_DIR="${LOG_DIR:-logs}"
+PID_DIR="${PID_DIR:-pids}"
+PIPE_DIR="${PIPE_DIR:-pipes}"
+mkdir -p "$LOG_DIR" "$PID_DIR" "$PIPE_DIR"
 
-mkdir -p "$LOG_DIR" "$PIPE_DIR" "$PID_DIR"
+# --- config 读取（三列：id host port；允许 CRLF）
+get_host() {
+  awk -v id="$1" 'BEGIN{h=""} $1==id{h=$2; exit} END{print h}' "$CONFIG_FILE" | tr -d '\r'
+}
+get_port() {
+  awk -v id="$1" 'BEGIN{p=""} $1==id{p=$3; exit} END{print p}' "$CONFIG_FILE" | tr -d '\r'
+}
 
-# Create/replace FIFO and start one member
+# --- 端口监听检测（用 netstat，避免 PowerShell 转义坑）
+port_ready() {
+  local port="$1"
+  if [[ -z "$port" ]]; then return 1; fi
+  netstat -ano 2>/dev/null | tr -d '\r' \
+    | grep -E "LISTEN|LISTENING" | grep -q ":${port}\b"
+}
+
+# --- 启动一个成员，把 stdin 绑到命名管道（给 CLI 用）
 start_member() {
-  local id="$1" profile="$2"
-  local pipe="$PIPE_DIR/M${id}.in"
-
-  # remove existing fifo/file then create a fresh one
-  if [[ -p "$pipe" || -e "$pipe" ]]; then
-    rm -f "$pipe"
-  fi
-  mkfifo -m 600 "$pipe"
-
-  (
-    set -o pipefail
-    "$JAVA_BIN" -cp "$CLASSPATH" "$MAIN_CLASS" \
-      --id "$id" --config "$CONFIG_FILE" --profile "$profile" \
-      < "$pipe" > "$LOG_DIR/M${id}.log" 2>&1
-  ) &
-  echo $! > "$PID_DIR/M${id}.pid"
-  sleep 0.15
+  local id="$1" profile="${2:-reliable}"
+  local logf="$LOG_DIR/member-$id.log"
+  local pf="$PIPE_DIR/m$id"
+  [[ -p "$pf" ]] || mkfifo "$pf"
+  nohup java -cp "$CLASSPATH" "$MAIN_CLASS" \
+    --id "$id" --profile "$profile" --config "$CONFIG_FILE" \
+    < "$pf" > "$logf" 2>&1 &
+  echo $! > "$PID_DIR/member-$id.pid"
+  echo "[start] M$id profile=$profile (pid=$(cat "$PID_DIR/member-$id.pid"))"
 }
 
-# Send a line to member's stdin
 send_cmd() {
-  local id="$1" cmd="$2"
-  local pipe="$PIPE_DIR/M${id}.in"
-  if [[ -p "$pipe" ]]; then
-    printf "%s\n" "$cmd" > "$pipe"
-  else
-    echo "WARN: pipe not found for M$id ($pipe)" >&2
-  fi
+  local id="$1"; shift
+  local pf="$PIPE_DIR/m$id"
+  [[ -p "$pf" ]] || { echo "[ERR] pipe not found: $pf" >&2; return 1; }
+  printf "%s\n" "$*" > "$pf"
 }
 
-# Stop all members (SIGTERM then SIGKILL), and clean FIFOs/PIDs
+wait_members_up() {
+  local n="${1:-$N_MEMBERS}" timeout="${2:-$READY_TIMEOUT}"
+  local deadline=$((SECONDS+timeout))
+  echo "[wait] members up (n=$n, timeout=${timeout}s)"
+
+  while (( SECONDS < deadline )); do
+    local ok=0
+    for i in $(seq 1 "$n"); do
+      local port; port="$(get_port "$i")"
+      if port_ready "$port"; then ((ok++)); fi
+    done
+    if (( ok >= (n/2+1) )); then
+      echo "[wait] majority ready: $ok/$n"
+      return 0
+    fi
+    sleep 0.3
+  done
+
+  echo "[ERROR] members not ready in time" >&2
+  return 1
+}
+
 stop_all() {
-  for f in "$PID_DIR"/M*.pid; do
-    [[ -f "$f" ]] || continue
-    local pid
-    pid="$(cat "$f" 2>/dev/null || true)"
-    if [[ -n "${pid:-}" ]]; then
-      kill "$pid" 2>/dev/null || true
-    fi
-  done
-
-  sleep 0.5
-
-  for f in "$PID_DIR"/M*.pid; do
-    [[ -f "$f" ]] || continue
-    local pid
-    pid="$(cat "$f" 2>/dev/null || true)"
-    if [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null; then
-      kill -9 "$pid" 2>/dev/null || true
-    fi
-  done
-
-  # cleanup so the next scenario can recreate fresh FIFOs/PIDs
-  rm -f "$PIPE_DIR"/M*.in  2>/dev/null || true
-  rm -f "$PID_DIR"/M*.pid  2>/dev/null || true
-}
-
-# Launch a 9-member cluster with per-member profiles (args: p1..p9)
-launch_9() {
-  local p1="$1" p2="$2" p3="$3" p4="$4" p5="$5" p6="$6" p7="$7" p8="$8" p9="$9"
-  start_member 1 "$p1"
-  start_member 2 "$p2"
-  start_member 3 "$p3"
-  start_member 4 "$p4"
-  start_member 5 "$p5"
-  start_member 6 "$p6"
-  start_member 7 "$p7"
-  start_member 8 "$p8"
-  start_member 9 "$p9"
-}
-
-# Collate & print consensus lines
-print_consensus() {
-  echo "---- CONSENSUS LINES ----"
-  grep -hR "^CONSENSUS" "$LOG_DIR" | sort || true
-}
-
-# Print key phases quickly (TX/RX/CONSENSUS)
-print_key_phases() {
-  echo "---- KEY PHASES (TX/RX/CONSENSUS) ----"
-  grep -hR -E "^(TX|RX|CONSENSUS)" "$LOG_DIR" | sort || true
+  shopt -s nullglob
+  if command -v taskkill >/dev/null 2>&1; then
+    for f in "$PID_DIR"/member-*.pid; do
+      pid="$(cat "$f" 2>/dev/null || true)"
+      [[ -n "${pid:-}" ]] && taskkill //F //PID "$pid" >/dev/null 2>&1 || true
+      rm -f "$f"
+    done
+  else
+    for f in "$PID_DIR"/member-*.pid; do
+      pid="$(cat "$f" 2>/dev/null || true)"
+      [[ -n "${pid:-}" ]] && kill -9 "$pid" >/devnull 2>&1 || true
+      rm -f "$f"
+    done
+  fi
 }

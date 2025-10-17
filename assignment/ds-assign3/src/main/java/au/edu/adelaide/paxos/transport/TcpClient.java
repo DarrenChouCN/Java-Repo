@@ -11,7 +11,13 @@ import java.nio.charset.StandardCharsets;
 
 public class TcpClient {
 
-    public void send(InetSocketAddress address, PaxosMessage msg) {
+    /**
+     * Sends a PaxosMessage to the specified address using a TCP socket.
+     *
+     * @param address the destination address
+     * @param msg     the PaxosMessage to send
+     */
+    public void sendPaxosMessage(InetSocketAddress address, PaxosMessage msg) {
         String line = PaxosMessageParser.toJson(msg) + "\n";
         try (Socket socket = new Socket()) {
             socket.connect(address);

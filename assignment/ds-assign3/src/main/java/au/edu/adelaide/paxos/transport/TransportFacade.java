@@ -72,7 +72,7 @@ public class TransportFacade implements AutoCloseable {
         if (!injector.beforeSendOrDispatch(msg, "send", to))
             return;
         // actually send
-        client.send(peer.address(), msg);
+        client.sendPaxosMessage(peer.address(), msg);
     }
 
     public void broadcast(PaxosMessage msg) {
@@ -82,7 +82,7 @@ public class TransportFacade implements AutoCloseable {
             if (!injector.beforeSendOrDispatch(msg, "broadcast", peer.id))
                 continue;
             // actually send
-            client.send(peer.address(), msg);
+            client.sendPaxosMessage(peer.address(), msg);
         }
     }
 
@@ -97,5 +97,9 @@ public class TransportFacade implements AutoCloseable {
 
     public void setFaultInjector(FaultInjector injector) {
         this.injector = (injector == null ? FaultInjector.NOOP : injector);
+    }
+
+    protected String currentProfileTag() {
+        return String.valueOf(injector);
     }
 }

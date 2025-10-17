@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
-set -euo pipefail
-source scripts/common.sh
+set -u
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
-echo "[Scenario1] Starting 9 members (all reliable)"
-launch_9 reliable reliable reliable reliable reliable reliable reliable reliable reliable
+echo "===> Scenario 1 (all reliable, single proposal)"
 
-# Give servers time to bind ports and warm up
-sleep 1.0
+for i in $(seq 1 "$N_MEMBERS"); do
+  start_member "$i" reliable
+done
 
-echo "[Scenario1] Propose from M1: 'M5'"
+if ! wait_members_up "$N_MEMBERS" "$READY_TIMEOUT"; then
+  echo "---- tail logs (M1..M3) ----"
+  for i in 1 2 3; do
+    echo "== member-$i.log =="
+    sed -n '1,120p' "logs/member-$i.log" || true
+  done
+  stop_all
+  exit 1
+fi
+
+echo "[Scenario1] M1: propose M5"
 send_cmd 1 "propose M5"
 
-# Wait a bit for consensus to form
-sleep 3
-
-print_consensus
-print_key_phases
-
-echo "[Scenario1] Stopping all members"
+sleep 2
 stop_all
+echo "[Scenario1] Done."

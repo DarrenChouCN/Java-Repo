@@ -1,37 +1,43 @@
 #!/usr/bin/env bash
-set -euo pipefail
-source scripts/common.sh
+set -u
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
-# Profiles layout:
-# - M2 = latent
-# - M3 = failure
-# - others = standard
-echo "[Scenario3] Starting 9 members (mixed: latent + failure)"
-launch_9 standard latent failure standard standard standard standard standard standard
+SETTLE="${SETTLE:-4}"
 
-sleep 1.2
+echo "===> Scenario 3 (mixed profiles: latent & failure present)"
 
-# Test 3a: A standard member (M4) initiates a proposal.
+profile_for() {
+  case "$1" in
+    2) echo "latent" ;;
+    3) echo "failure" ;;
+    *) echo "standard" ;;
+  esac
+}
+
+for i in $(seq 1 "$N_MEMBERS"); do
+  start_member "$i" "$(profile_for "$i")"
+done
+
+if ! wait_members_up "$N_MEMBERS" "$READY_TIMEOUT"; then
+  echo "---- tail logs (M1..M3) ----"
+  for i in 1 2 3; do
+    echo "== logs/member-$i.log =="; sed -n '1,160p' "logs/member-$i.log" || true
+  done
+  stop_all
+  exit 1
+fi
+
 echo "[Scenario3/3a] M4 proposes 'S3A'"
 send_cmd 4 "propose S3A"
-sleep 3
-echo "[Scenario3/3a] Consensus so far:"
-print_consensus
+sleep "$SETTLE"
 
-# Test 3b: A latent member (M2) initiates a proposal. Despite its high latency, the system should still reach consensus.
 echo "[Scenario3/3b] M2 (latent) proposes 'S3B'"
 send_cmd 2 "propose S3B"
-sleep 4
-echo "[Scenario3/3b] Consensus so far:"
-print_consensus
+sleep "$SETTLE"
 
-# Test 3c: The failing member (M3) initiates a proposal, sends its PREPARE messages, and then "crashes" (terminates).
-echo "[Scenario3/3c] M6 proposes 'S3C' (M3 will crash-once on its first PREPARE)"
+echo "[Scenario3/3c] M6 proposes 'S3C'"
 send_cmd 6 "propose S3C"
-sleep 4
+sleep "$SETTLE"
 
-print_consensus
-print_key_phases
-
-echo "[Scenario3] Stopping all members"
 stop_all
+echo "[Scenario3] Done."

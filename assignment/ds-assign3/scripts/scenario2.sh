@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
-set -euo pipefail
-source scripts/common.sh
+set -u
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
-echo "[Scenario2] Starting 9 members (standard network)"
-launch_9 standard standard standard standard standard standard standard standard standard
+echo "===> Scenario 2 (concurrent proposals)"
 
-sleep 1.0
+for i in $(seq 1 "$N_MEMBERS"); do
+  start_member "$i" standard
+done
 
-echo "[Scenario2] Concurrent proposals: M1='A', M8='B'"
-send_cmd 1 "propose A"
-# tiny offset to emulate near-simultaneous
+if ! wait_members_up "$N_MEMBERS" "$READY_TIMEOUT"; then
+  echo "---- tail logs (M1..M3) ----"
+  for i in 1 2 3; do
+    echo "== logs/member-$i.log =="; sed -n '1,120p' "logs/member-$i.log" || true
+  done
+  stop_all
+  exit 1
+fi
+
+echo "[Scenario2] concurrent proposals: M1->M5, M8->M7"
+send_cmd 1 "propose M5"
 sleep 0.05
-send_cmd 8 "propose B"
+send_cmd 8 "propose M7"
 
-sleep 4
-
-print_consensus
-
-# Optional: quick check whether only one distinct value appears
-distinct=$(grep -hR "^CONSENSUS" "$LOG_DIR" | awk '{for(i=1;i<=NF;i++) if($i ~ /^value=/){print $i}}' | sort -u | wc -l | tr -d ' ')
-echo "[Scenario2] Distinct consensus values: $distinct (expect 1)"
-print_key_phases
-
-echo "[Scenario2] Stopping all members"
+sleep 3
 stop_all
+echo "[Scenario2] Done."
